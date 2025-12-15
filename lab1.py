@@ -33,9 +33,11 @@ def apply_strategy(data, shorter_window=50, longer_window=200, vix_threshold=20)
 
     # generate signals: we want to long if shorter ma > longer than ma and vix < threshold
     # otherwise, we stay neutral
-    data['Signal'] = np.where((data['Shorter MA'] > data['Longer MA']) &
+    data['Adv Signal'] = np.where((data['Shorter MA'] > data['Longer MA']) &
                               (data['VIX'] < vix_threshold), 1, 0)
     
+    data['Bsc Signal'] = np.where(data['Shorter MA'] > data['Longer MA'], 1, 0)
+
     return data
 
 def backtest(data):
@@ -43,13 +45,15 @@ def backtest(data):
     # you can only act on them the next day
     # so gng you gotta shift everything back by 1
     # assume your df is well-formatted
-    data['Strategy Return'] = data['Signal'].shift(1) * data['Daily Log Return']
+    data['Adv Strategy Return'] = data['Adv Signal'].shift(1) * data['Daily Log Return']
+    data['Bsc Strategy Return'] = data['Bsc Signal'].shift(1) * data['Daily Log Return']
     data.dropna(inplace=True)
     data['Long Strategy Return'] = data['Daily Log Return'].cumsum().apply(np.exp)
-    data['MA Strategy Return'] = data['Strategy Return'].cumsum().apply(np.exp)
+    data['Adv MA Strategy Return'] = data['Adv Strategy Return'].cumsum().apply(np.exp)
+    data['Bsc MA Strategy Return'] = data['Bsc Strategy Return'].cumsum().apply(np.exp)
 
-
-data = get_data()
+# i kinda wanna find what the optimal vix threshold is
+data = get_data(ticker='AAPL')
 apply_strategy(data)
 backtest(data)
-print(data.tail())
+print(data[['Long Strategy Return', 'Adv MA Strategy Return', 'Bsc MA Strategy Return']].tail())
