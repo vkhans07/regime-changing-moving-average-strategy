@@ -48,16 +48,16 @@ def backtest(data):
     data['Adv Strategy Return'] = data['Adv Signal'].shift(1) * data['Daily Log Return']
     data['Bsc Strategy Return'] = data['Bsc Signal'].shift(1) * data['Daily Log Return']
     data.dropna(inplace=True)
-    data['Long Strategy Return'] = data['Daily Log Return'].cumsum().apply(np.exp)
-    data['Adv MA Strategy Return'] = data['Adv Strategy Return'].cumsum().apply(np.exp)
-    data['Bsc MA Strategy Return'] = data['Bsc Strategy Return'].cumsum().apply(np.exp)
+    data['Total Long Strategy Return'] = data['Daily Log Return'].cumsum().apply(np.exp)
+    data['Total Adv MA Strategy Return'] = data['Adv Strategy Return'].cumsum().apply(np.exp)
+    data['Total Bsc MA Strategy Return'] = data['Bsc Strategy Return'].cumsum().apply(np.exp)
 
 # i kinda wanna find what the optimal vix threshold is
-data = get_data(ticker='AAPL')
+data = get_data(ticker='SPY')
 apply_strategy(data)
 backtest(data)
-print(data[['Long Strategy Return', 'Adv MA Strategy Return', 'Bsc MA Strategy Return']].tail())
+print(data[['Total Long Strategy Return', 'Total Adv MA Strategy Return', 'Total Bsc MA Strategy Return']].tail())
 print('Sharpe Ratios:')
-print(f'Long Only: {data["Long Strategy Return"].mean() / data["Long Strategy Return"].std() * np.sqrt(252)}')
-print(f'Adv MA Only: {data["Adv MA Strategy Return"].mean() / data["Adv MA Strategy Return"].std() * np.sqrt(252)}')
-print(f'Bsc MA Only: {data["Bsc MA Strategy Return"].mean() / data["Bsc MA Strategy Return"].std() * np.sqrt(252)}')
+print(f'Long Only: {data["Daily Log Return"].mean() / data["Daily Log Return"].std() * np.sqrt(252)}')
+print(f'Adv MA Only: {data["Adv Strategy Return"].mean() / data["Adv Strategy Return"].std() * np.sqrt(252)}')
+print(f'Bsc MA Only: {data["Bsc Strategy Return"].mean() / data["Bsc Strategy Return"].std() * np.sqrt(252)}')
