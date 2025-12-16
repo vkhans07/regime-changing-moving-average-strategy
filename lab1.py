@@ -22,7 +22,7 @@ def get_data(ticker='SPY', start_date='2010-01-01', end_date='2025-01-01'):
 
 # idea is that we'll use moving averages to determine trend direction, but only trade
 # when VIX is below a certain threshold to avoid high volatility periods
-def apply_strategy(data, shorter_window=50, longer_window=200, vix_threshold=20):
+def fixed_vix_ma_strategy(data, shorter_window=50, longer_window=200, vix_threshold=20):
     # log returns are easy
     data['Daily Log Return'] = np.log(data['Price'] / data['Price'].shift(1))
     # i think this is fine? it just drops off the first monday when we don't have a return
@@ -53,7 +53,7 @@ def backtest(data):
 
 # i kinda wanna find what the optimal vix threshold is
 data = get_data(ticker='SPY')
-apply_strategy(data)
+fixed_vix_ma_strategy(data)
 backtest(data)
 print(data[['Total Long Strategy Return', 'Total Adv MA Strategy Return', 'Total Bsc MA Strategy Return']].tail())
 print('Sharpe Ratios:')
@@ -61,12 +61,12 @@ print(f'Long Only: {data["Daily Log Return"].mean() / data["Daily Log Return"].s
 print(f'Adv MA Only: {data["Adv Strategy Return"].mean() / data["Adv Strategy Return"].std() * np.sqrt(252)}')
 print(f'Bsc MA Only: {data["Bsc Strategy Return"].mean() / data["Bsc Strategy Return"].std() * np.sqrt(252)}')
 
-
 plt.plot(data.index, data['Total Long Strategy Return'], label='Long Only', color='blue')
 plt.plot(data.index, data['Total Adv MA Strategy Return'], label='VIX-Controlled MA', color='red')
 plt.plot(data.index, data['Total Bsc MA Strategy Return'], label='Uncontrolled MA', color='green')
 plt.xlabel('Date')
 plt.ylabel('Cumulative Return')
 plt.legend()
-plt.show()
 plt.savefig('Fixed Vix Threshold Moving Average Strategy.png')
+plt.show()
+plt.clf()
