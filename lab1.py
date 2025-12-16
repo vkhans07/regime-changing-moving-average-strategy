@@ -2,7 +2,6 @@ import datetime as dt
 import pandas as pd
 import numpy as np
 import yfinance as yf
-import warnings
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 from scipy.stats import zscore
@@ -61,3 +60,13 @@ print('Sharpe Ratios:')
 print(f'Long Only: {data["Daily Log Return"].mean() / data["Daily Log Return"].std() * np.sqrt(252)}')
 print(f'Adv MA Only: {data["Adv Strategy Return"].mean() / data["Adv Strategy Return"].std() * np.sqrt(252)}')
 print(f'Bsc MA Only: {data["Bsc Strategy Return"].mean() / data["Bsc Strategy Return"].std() * np.sqrt(252)}')
+
+
+plt.plot(data.index, data['Total Long Strategy Return'], label='Long Only', color='blue')
+plt.plot(data.index, data['Total Adv MA Strategy Return'], label='VIX-Controlled MA', color='red')
+plt.plot(data.index, data['Total Bsc MA Strategy Return'], label='Uncontrolled MA', color='green')
+plt.xlabel('Date')
+plt.ylabel('Cumulative Return')
+plt.legend()
+plt.show()
+plt.savefig('Fixed Vix Threshold Moving Average Strategy.png')
